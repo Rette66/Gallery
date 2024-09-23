@@ -30,7 +30,6 @@ public class PhotoViewerActivity extends AppCompatActivity {
         scaleGestureDetector = new ScaleGestureDetector(this, new scaleListener());
 
         //display image using bitmap
-        //todo: not sure if is needed
         Bitmap bitmap = null;
         try {
             bitmap = loadBitmap(photoId);
