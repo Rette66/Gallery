@@ -3,6 +3,8 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -40,15 +42,26 @@ public class MainActivity extends AppCompatActivity implements PhotoLoader.OnPho
         // initializing recycler view.
         prepareRecyclerView();
 
+        //set cutout to be displayed
+        setCutoutDisplay();
+
+        //initial imageCache
         imageCache = new ImageCache((int) (Runtime.getRuntime().maxMemory() / 8));
 
         // request permissions
         requestPermissions();
     }
 
+    private void setCutoutDisplay(){
+        Window window = getWindow();
+        WindowManager.LayoutParams params = window.getAttributes();
+        params.layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_ALWAYS;
+        window.setAttributes(params);
+    }
+
     private void prepareRecyclerView() {
         recyclerView = findViewById(R.id.idRVImages);
-
+//        int count =
         // creating a new grid layout manager.
         GridLayoutManager manager = new GridLayoutManager(MainActivity.this, 4);
 

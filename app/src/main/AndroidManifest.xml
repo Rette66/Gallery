@@ -6,6 +6,13 @@
         android:name="android.permission.READ_MEDIA_IMAGES"
         android:minSdkVersion="33" />
 
+    <supports-screens
+        android:smallScreens="true"
+        android:normalScreens="true"
+        android:largeScreens="true"
+        android:xlargeScreens="true"
+        android:anyDensity="true" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
