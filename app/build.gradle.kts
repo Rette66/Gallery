@@ -33,7 +33,6 @@ android {
 
 dependencies {
 // below dependency for using Picasso image loading library
-    implementation (libs.picasso)
 
     implementation(libs.appcompat)
     implementation(libs.material)
