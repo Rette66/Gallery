@@ -1,13 +1,13 @@
-package com.example.galleryapi33.Photo;
+package com.example.galleryapi33;
 
-public class Photo {
+public class image {
 
     private String id;
     private int orientation;
     private int width;
     private int height;
 
-    public Photo(String id, int orientation, int width, int height){
+    public image(String id, int orientation, int width, int height){
         this.id = id;
         this.orientation = orientation;
         this.width = width;
@@ -21,13 +21,5 @@ public class Photo {
 
     public int getOrientation() {
         return orientation;
-    }
-
-    public int getWidth() {
-        return width;
-    }
-
-    public int getHeight() {
-        return height;
     }
 }

@@ -1,4 +1,4 @@
-package com.example.galleryapi33.Photo;
+package com.example.galleryapi33;
 
 
 import android.graphics.Bitmap;
@@ -7,15 +7,15 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.ScaleGestureDetector;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import androidx.appcompat.app.AppCompatActivity;
-
-import com.example.galleryapi33.R;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 
-public class PhotoViewerActivity extends AppCompatActivity {
+public class ViewerActivity extends AppCompatActivity {
     private ImageView imageView;
     private ScaleGestureDetector scaleGestureDetector;
 
@@ -23,6 +23,8 @@ public class PhotoViewerActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_photo_viewer);
+
+        setCutoutDisplay();
 
         imageView = findViewById(R.id.photo_image_viewer);
         String photoId = getIntent().getStringExtra("photo_id");
@@ -37,6 +39,19 @@ public class PhotoViewerActivity extends AppCompatActivity {
             throw new RuntimeException(e);
         }
         imageView.setImageBitmap(bitmap);
+        imageView.setOnTouchListener((v, event) -> {
+            scaleGestureDetector.onTouchEvent(event);
+            return true;
+        });
+//        imageView.setScaleType(ImageView.ScaleType.MATRIX);
+
+    }
+
+    private void setCutoutDisplay(){
+        Window window = getWindow();
+        WindowManager.LayoutParams params = window.getAttributes();
+        params.layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES;
+        window.setAttributes(params);
     }
 
 
@@ -54,6 +69,7 @@ public class PhotoViewerActivity extends AppCompatActivity {
             scaleFactor = Math.max(1.0f, Math.min(scaleFactor, 5.0f));
             imageView.setScaleX(scaleFactor);
             imageView.setScaleY(scaleFactor);
+            imageView.invalidate(); // 通知ImageView重绘
             return true;
         }
 
@@ -64,7 +80,7 @@ public class PhotoViewerActivity extends AppCompatActivity {
 
         @Override
         public void onScaleEnd(ScaleGestureDetector detector) {
-            scaleFactor = 1.0f;
+//            scaleFactor = 1.0f;
         }
     }
 

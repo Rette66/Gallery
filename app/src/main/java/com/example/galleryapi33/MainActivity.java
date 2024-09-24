@@ -1,8 +1,6 @@
 package com.example.galleryapi33;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Toast;
@@ -14,25 +12,19 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import static android.Manifest.permission.READ_MEDIA_IMAGES;
 
-import com.example.galleryapi33.Photo.ImageCache;
-import com.example.galleryapi33.Photo.Photo;
-import com.example.galleryapi33.Photo.PhotoAdaptor;
-import com.example.galleryapi33.Photo.PhotoLoader;
-
-public class MainActivity extends AppCompatActivity implements PhotoLoader.OnPhotosLoadedListener{
+public class MainActivity extends AppCompatActivity implements Loader.OnPhotosLoadedListener{
 
     // on below line we are creating variables for
     // our array list, recycler view and adapter class.
-    private static final int PERMISSION_REQUEST_CODE = 200;
+    private static final int READ_IMAGE_PERMISSION_CODE = 100;
     private RecyclerView recyclerView;
-    private ImageCache imageCache;
+    private Cache cache;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,25 +35,21 @@ public class MainActivity extends AppCompatActivity implements PhotoLoader.OnPho
         prepareRecyclerView();
 
         //set cutout to be displayed
-        setCutoutDisplay();
+        Window window = getWindow();
+        WindowManager.LayoutParams params = window.getAttributes();
+        params.layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES;
+        window.setAttributes(params);
 
         //initial imageCache
-        imageCache = new ImageCache((int) (Runtime.getRuntime().maxMemory() / 8));
+        cache = new Cache((int) (Runtime.getRuntime().maxMemory() / 8));
 
         // request permissions
         requestPermissions();
     }
 
-    private void setCutoutDisplay(){
-        Window window = getWindow();
-        WindowManager.LayoutParams params = window.getAttributes();
-        params.layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_ALWAYS;
-        window.setAttributes(params);
-    }
 
     private void prepareRecyclerView() {
         recyclerView = findViewById(R.id.idRVImages);
-//        int count =
         // creating a new grid layout manager.
         GridLayoutManager manager = new GridLayoutManager(MainActivity.this, 4);
 
@@ -70,19 +58,20 @@ public class MainActivity extends AppCompatActivity implements PhotoLoader.OnPho
     }
 
     @Override
-    public void onPhotosLoaded(List<Photo> photoList) {
+    public void onPhotosLoaded(List<image> imageList) {
         runOnUiThread(() -> {
-            recyclerView.setAdapter(new PhotoAdaptor(photoList, imageCache, this));
+            recyclerView.setAdapter(new Adaptor(imageList, cache, this));
         });
     }
 
     private void requestPermissions() {
         if (checkPermission()) {
             //permission granted, load photos
-            loadPhotos();
+            ExecutorService executor = Executors.newSingleThreadExecutor();
+            executor.execute(new Loader(this, this));
         } else {
             //no permission, request permission
-            requestPermission();
+            ActivityCompat.requestPermissions(this, new String[]{READ_MEDIA_IMAGES}, READ_IMAGE_PERMISSION_CODE);
         }
     }
 
@@ -94,21 +83,14 @@ public class MainActivity extends AppCompatActivity implements PhotoLoader.OnPho
 
     private void loadPhotos(){
         ExecutorService executor = Executors.newSingleThreadExecutor();
-        executor.execute(new PhotoLoader(this, this));
+        executor.execute(new Loader(this, this));
     }
-
-    private void requestPermission() {
-        ActivityCompat.requestPermissions(this, new String[]{READ_MEDIA_IMAGES}, PERMISSION_REQUEST_CODE);
-    }
-
 
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
-        // this method is called after permissions has been granted.
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        // we are checking the permission code.
-        if (requestCode == PERMISSION_REQUEST_CODE) {// in this case we are checking if the permissions are accepted or not.
+    public void onRequestPermissionsResult(int code, @NonNull String permissions[], @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(code, permissions, grantResults);
+        if (code == READ_IMAGE_PERMISSION_CODE) {// in this case we are checking if the permissions are accepted or not.
             if (grantResults.length > 0) {
                 boolean storageAccepted = grantResults[0] == PackageManager.PERMISSION_GRANTED;
                 if (storageAccepted) {

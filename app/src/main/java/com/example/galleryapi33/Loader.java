@@ -1,4 +1,4 @@
-package com.example.galleryapi33.Photo;
+package com.example.galleryapi33;
 
 import android.content.ContentResolver;
 import android.content.Context;
@@ -10,18 +10,18 @@ import android.provider.MediaStore;
 
 import java.util.ArrayList;
 import java.util.List;
-public class PhotoLoader implements Runnable {
+public class Loader implements Runnable {
     private Context context;
     private OnPhotosLoadedListener listener;
 
-    public PhotoLoader(Context context, OnPhotosLoadedListener listener) {
+    public Loader(Context context, OnPhotosLoadedListener listener) {
         this.context = context;
         this.listener = listener;
     }
 
     @Override
     public void run() {
-        List<Photo> photoList = new ArrayList<>();
+        List<image> imageList = new ArrayList<>();
         ContentResolver contentResolver = context.getContentResolver();
         Uri uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
         String sortOrder = MediaStore.Images.Media.DATE_ADDED + " DESC";
@@ -34,16 +34,16 @@ public class PhotoLoader implements Runnable {
                 int orientation = cursor.getInt(cursor.getColumnIndex(MediaStore.Images.Media.ORIENTATION));
                 int width = cursor.getInt(cursor.getColumnIndex(MediaStore.Images.Media.WIDTH));
                 int height = cursor.getInt(cursor.getColumnIndex(MediaStore.Images.Media.HEIGHT));
-                photoList.add(new Photo(id, orientation, width, height));
+                imageList.add(new image(id, orientation, width, height));
             } while (cursor.moveToNext());
             cursor.close();
         }
 
         // Notify the main thread
-        new Handler(Looper.getMainLooper()).post(() -> listener.onPhotosLoaded(photoList));
+        new Handler(Looper.getMainLooper()).post(() -> listener.onPhotosLoaded(imageList));
     }
 
     public interface OnPhotosLoadedListener {
-        void onPhotosLoaded(List<Photo> photoList);
+        void onPhotosLoaded(List<image> imageList);
     }
 }

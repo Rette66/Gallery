@@ -1,12 +1,12 @@
-package com.example.galleryapi33.Photo;
+package com.example.galleryapi33;
 
 import android.graphics.Bitmap;
 import android.util.LruCache;
 
-public class ImageCache {
+public class Cache {
     private LruCache<String, Bitmap> cache;
 
-    public ImageCache(int maxMemory) {
+    public Cache(int maxMemory) {
 //        final int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
         this.cache = new LruCache<>(maxMemory);
     }

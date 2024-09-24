@@ -11,7 +11,7 @@
     <!--Image view for displaying the image
         in our card layout in recycler view-->
     <ImageView
-        android:id="@+id/idIVImage"
+        android:id="@+id/thumbnailsImage"
         android:layout_width="100dp"
         android:layout_height="100dp"
         android:layout_gravity="center"
